@@ -1,0 +1,34 @@
+{
+    "name": "sae-robot-devenv",
+    "dockerFile": "../Dockerfile",
+  
+    "settings": {
+      "terminal.integrated.shell.linux": "/bin/bash"
+    },
+  
+    "extensions": [
+      "ms-vscode.cpptools-extension",
+      "ms-python.python", 
+      "tht13.python",
+      "visualstudioexptteam.vscodeintellicode", 
+      "ms-toolsai.jupyter"
+    ],
+
+    "runArgs": ["--gpus", "all", 
+      "--net", "host",
+      "--privileged", "--rm", 
+      "--env", "DISPLAY=:1",
+      "--env", "PULSE_SERVER=unix:/run/user/1000/pulse/native",
+      "--volume", "/tmp/.X11-unix:/tmp/.X11-unix",
+      "--volume", "/etc/alsa:/etc/alsa",
+      "--volume", "/usr/share/alsa:/usr/share/alsa",
+      "--volume", "/run/user/1000/pulse/native:/run/user/1000/pulse/native",
+      "--volume", "/dev/snd:/dev/snd",
+      "--runtime", "nvidia", 
+      "-e", "NVIDIA_VISIBLE_DEVICES=0",
+      "-e", "SDL_HINT_CUDA_DEVICE='0'"
+    ],
+    
+
+    "remoteUser": "fsdssim_user"
+  }
