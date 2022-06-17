@@ -30,6 +30,7 @@ SET(TARGET_H
     aquisition/source_camera_usb.h
     control/process_handler.h
     ocupancy_grid/ocupancy_grid.h
+    log/logger.h
 )
     
 
@@ -37,6 +38,7 @@ cuda_add_executable(vision
     vision.cpp
     ocupancy_grid/occupancy_grid_impl.cpp
     control/process_handler.cpp
+    log/logger_debug_stdout.cpp
 )
 
 # link my-recognition to jetson-inference library

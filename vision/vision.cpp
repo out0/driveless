@@ -22,12 +22,15 @@
 #include "aquisition/source_camera_usb.h"
 #include "ocupancy_grid/occupancy_grid.h"
 #include "control/process_handler.h"
+#include "log/logger.h"
 
 // https://gist.github.com/jungle-cat
 
 using namespace std;
 using namespace cv;
 using namespace chrono;
+
+#define DEBUG 1
 
 typedef uchar3 pixelType;
 
@@ -38,6 +41,7 @@ private:
     segNet *net;
     OccupancyGrid *ocgrid;
     ProcHandler *procHandler;
+    Logger *logger;
     bool loop_run;
     pixelType *imgMask = NULL;      // color of each segmentation class
     pixelType *imgOverlay = NULL;   // input + alpha-blended mask
@@ -112,12 +116,13 @@ private:
     }
 
 public:
-    NeuralNetVision(SourceCamera *input, segNet *net, OccupancyGrid *ocgrid, ProcHandler *procHandler)
+    NeuralNetVision(SourceCamera *input, segNet *net, OccupancyGrid *ocgrid, ProcHandler *procHandler, Logger *logger)
     {
         this->input = input;
         this->net = net;
         this->ocgrid = ocgrid;
         this->procHandler = procHandler;
+        this->logger = logger;
         loop_run = true;
 
         SetVisualizationFlags("overlay|mask");
@@ -126,10 +131,12 @@ public:
     NeuralNetVision SetVisualizationFlags(uint32_t flags)
     {
         visualizationFlags = flags;
+        logger->info("set visualization flags to value %d", flags);
     }
     NeuralNetVision SetVisualizationFlags(string flags)
     {
         visualizationFlags = segNet::VisualizationFlagsFromStr(flags.c_str());
+        logger->info("set visualization flags from %s (value %d)", flags.c_str(), visualizationFlags);
     }
 
     void Terminate()
@@ -203,6 +210,13 @@ extern OccupancyGrid *NewOccupancyGridImplInstance();
 extern ProcHandler *NewProcHandlerImplInstance();
 NeuralNetVision *visionProc;
 
+#ifdef DEBUG
+extern Logger* NewDebugLoggerInstance();
+Logger* logger = NewDebugLoggerInstance();
+#else
+Logger* logger = new Logger();
+#endif
+
 void sig_handler(int val)
 {
     if (val == SIGINT)
@@ -218,7 +232,7 @@ int main(int argc, char **argv)
     OccupancyGrid *computeOG = NewOccupancyGridImplInstance();
     ProcHandler *procHandler = NewProcHandlerImplInstance();
     segNet *net = segNet::Create();
-    visionProc = new NeuralNetVision(camera, net, computeOG, procHandler);
+    visionProc = new NeuralNetVision(camera, net, computeOG, procHandler, logger);
 
     if (signal(SIGINT, sig_handler) == SIG_ERR)
         LogError("can't catch SIGINT\n");
