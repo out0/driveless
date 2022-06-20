@@ -33,7 +33,10 @@ SET(TARGET_H
 )
     
 
-cuda_add_executable(usbread jetson_usb_reader_test.cpp)
+cuda_add_executable(usb2file test_usb_to_file.cpp)
+
+cuda_add_executable(usbview test_usb_viewer.cpp)
 
 # link my-recognition to jetson-inference library
-target_link_libraries(usbread jetson-inference ${OpenCV_LIBS})
+target_link_libraries(usb2file jetson-inference ${OpenCV_LIBS})
+target_link_libraries(usbview jetson-inference ${OpenCV_LIBS})

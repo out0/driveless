@@ -123,6 +123,29 @@ public:
         return (void *)imgptr;
     }
 
+    float * CaptureRGBA(uint64_t timeout = UINT64_MAX) override
+    {
+        if (!available)
+            LogError("camera not available\n");
+
+        float4 *imgptr = NULL;
+
+        if (!input->Capture(&imgptr, timeout))
+        {
+            // check for EOS
+            if (!input->IsStreaming())
+            {
+                LogError("not streaming\n");
+                return NULL;
+            }
+
+            LogError("failed to capture video frame\n");
+            return NULL;
+        }
+
+        return (float *)imgptr;
+    }
+
     void Close() override
     {
         if (!available)

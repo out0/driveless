@@ -11,6 +11,7 @@ public:
     virtual uint32_t GetWidth() = 0;
     virtual uint32_t GetHeight() = 0;
     virtual void* Capture(uint64_t timeout=100000) = 0;
+    virtual float * CaptureRGBA(uint64_t timeout = 100000) = 0;
     virtual bool IsStreaming() = 0;
     virtual void Close() = 0;
     virtual void initWithOptions(videoOptions &options) = 0;

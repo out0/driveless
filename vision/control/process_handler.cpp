@@ -12,16 +12,18 @@ public:
     void FrameSkipNetError() override
     {
     }
-
     virtual void FrameSkipSegmentationOverlayError() override
     {
     }
     virtual void FrameSkipSegmentationMaskError() override
     {
     }
-    virtual void FrameProcessResult(void *result_value)  override
+    virtual void FrameProcessResult(void *result_value) override
+    {
+    }
+    virtual void FrameCaptured(uchar3 *result_value) override
     {
     }
 };
 
-ProcHandler* NewProcHandlerImplInstance() { return new ProcHandlerImpl(); }
+ProcHandler *NewProcHandlerImplInstance() { return new ProcHandlerImpl(); }

@@ -109,6 +109,7 @@ void NeuralNetVision::LoopUntilSignaled()
         }
 
         logger->info("frame captured");
+        procHandler->FrameCaptured(frame);
 
         // cv::Mat mask_image_bgr, mask_image_rgb, original_image_bgr, original_image_rgb;
         // original_image_rgb = cv::Mat(input->GetHeight(), input->GetWidth(), CV_8UC3, frame);
