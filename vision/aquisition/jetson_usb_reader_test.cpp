@@ -19,9 +19,10 @@
 #include <jetson-utils/cudaMappedMemory.h>
 #include <jetson-inference/segNet.h>
 
-#include "camera_drivers/source_camera_usb.h"
+#include "source_camera_gst.h"
 
 // https://gist.github.com/jungle-cat
+// v4l2-ctl --list-formats-ext -d /dev/video1
 
 using namespace std;
 using namespace cv;
@@ -31,8 +32,10 @@ typedef uchar3 pixelType;
 
 int main(int argc, char **argv)
 {
-
-    SourceCamera *camera = new SourceCameraDummyImpl("/dev/video1");
+    SourceCamera *camera = SourceCameraUSBImpl::begin()
+                               ->device("/dev/video1")
+                               ->withSize(640, 480)
+                               ->build();
 
     pixelType *imgInput = (pixelType *)camera->Capture(100000);
 
@@ -51,7 +54,12 @@ int main(int argc, char **argv)
 
     cout << "camera width = " << camera->GetWidth() << ", height = " << camera->GetHeight() << endl;
 
-    // cv::imwrite("output.jpg", imgInput);
+    cv::Mat mask_image_bgr, mask_image_rgb, original_image_bgr, original_image_rgb;
+    original_image_rgb = cv::Mat(camera->GetHeight(), camera->GetWidth(), CV_8UC3, imgInput);
+    original_image_bgr = cv::Mat(camera->GetHeight(), camera->GetWidth(), CV_8UC3);
+    cv::cvtColor(original_image_rgb, original_image_bgr, cv::COLOR_RGB2BGR);
+    std::string img_name = std::string("frame.png");
+    cv::imwrite(img_name, original_image_bgr);
+
     return 0;
 }
-

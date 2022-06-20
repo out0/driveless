@@ -13,6 +13,9 @@ public:
     virtual void* Capture(uint64_t timeout=100000) = 0;
     virtual bool IsStreaming() = 0;
     virtual void Close() = 0;
+    virtual void initWithOptions(videoOptions &options) = 0;
+
 };
+
 
 #endif

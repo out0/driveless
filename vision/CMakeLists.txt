@@ -21,6 +21,8 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(${CUDA_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR})
+include_directories(/usr/include/gstreamer-1.0 /usr/lib/aarch64-linux-gnu/gstreamer-1.0/include /usr/include/glib-2.0 /usr/include/libxml2 /usr/lib/aarch64-linux-gnu/glib-2.0/include/)
+
 # add directory for libnvbuf-utils to program
 link_directories(/usr/lib/aarch64-linux-gnu/tegra)
 
@@ -31,6 +33,7 @@ SET(TARGET_H
     control/process_handler.h
     ocupancy_grid/ocupancy_grid.h
     log/logger.h
+    segmentation/neuralnet_segmentation.h
 )
     
 
@@ -39,6 +42,7 @@ cuda_add_executable(vision
     ocupancy_grid/occupancy_grid_impl.cpp
     control/process_handler.cpp
     log/logger_debug_stdout.cpp
+    segmentation/neuralnet_segmentation.cpp
 )
 
 # link my-recognition to jetson-inference library

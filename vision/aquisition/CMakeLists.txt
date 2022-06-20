@@ -21,17 +21,19 @@ set(CMAKE_CXX_STANDARD 14)
 include_directories(${CUDA_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR})
+include_directories(/usr/include/gstreamer-1.0 /usr/lib/aarch64-linux-gnu/gstreamer-1.0/include /usr/include/glib-2.0 /usr/include/libxml2 /usr/lib/aarch64-linux-gnu/glib-2.0/include/)
+
 # add directory for libnvbuf-utils to program
 link_directories(/usr/lib/aarch64-linux-gnu/tegra)
 
 # compile the my-recognition program
 SET(TARGET_H
     camera_drivers/source_camera.h
-    camera_drivers/source_camera_usb.h
+    camera_drivers/source_camera_gst.h
 )
     
 
-cuda_add_executable(usbread jetson_usb_reader.cpp)
+cuda_add_executable(usbread jetson_usb_reader_test.cpp)
 
 # link my-recognition to jetson-inference library
 target_link_libraries(usbread jetson-inference ${OpenCV_LIBS})
