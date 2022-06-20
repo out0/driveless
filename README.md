@@ -1,6 +1,8 @@
 # driveless
 UFSC driveless car project repository
 
+Based on https://github.com/ngoeldner/Crawler-SNA/
+
 ## Development Environments
 
 dev-env/ is the repo for any development environments to help us quickly jump into coding.
