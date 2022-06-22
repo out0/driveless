@@ -31,17 +31,17 @@ bool test_capture()
     SourceCameraDatasetImpl *camera = new SourceCameraDatasetImpl(384, 216);
 
     camera
-        ->AddSource("../imgs/0.png")
-        ->AddSource("../imgs/1.png")
-        ->AddSource("../imgs/2.png");
+        ->AddSource("../../imgs/0.png")
+        ->AddSource("../../imgs/1.png")
+        ->AddSource("../../imgs/2.png");
 
-    if (!test_img(camera, "../imgs/0.png"))
+    if (!test_img(camera, "../../imgs/0.png"))
         return false;
-    if (!test_img(camera, "../imgs/1.png"))
+    if (!test_img(camera, "../../imgs/1.png"))
         return false;
-    if (!test_img(camera, "../imgs/2.png"))
+    if (!test_img(camera, "../../imgs/2.png"))
         return false;
-    if (!test_img(camera, "../imgs/0.png"))
+    if (!test_img(camera, "../../imgs/0.png"))
         return false;
 
     SAFE_DELETE(camera);

@@ -43,7 +43,15 @@ private:
     int2 compositeSize;
     int2 outputSize;
 
+    std::string ignoreClass;
+    segNet::FilterMode filterMode;
+
+protected:
     bool allocBuffers(int width, int height, uint32_t flags);
+    bool allocateCudaBuffers();
+    pixelType *captureNextFrame();
+    bool processSegmentation(pixelType *frame);
+    void loop();
 
 public:
     NeuralNetVision(SourceCamera *input, segNet *net, OccupancyGrid *ocgrid, ProcHandler *procHandler, Logger *logger);

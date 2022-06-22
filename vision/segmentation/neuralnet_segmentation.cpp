@@ -69,6 +69,8 @@ NeuralNetVision::NeuralNetVision(SourceCamera *input, segNet *net, OccupancyGrid
     loop_run = true;
 
     SetVisualizationFlags("overlay|mask");
+    this->ignoreClass = "void";
+    this->filterMode = segNet::FilterModeFromStr("linear");
 }
 
 NeuralNetVision *NeuralNetVision::SetVisualizationFlags(uint32_t flags)
@@ -90,84 +92,104 @@ void NeuralNetVision::Terminate()
     loop_run = false;
 }
 
+pixelType *NeuralNetVision::captureNextFrame()
+{
+    pixelType *frame = (pixelType *)input->Capture(10000);
+    if (frame == NULL)
+    {
+        if (!input->IsStreaming())
+            loop_run = false;
+
+        procHandler->FrameSkipCaptureError();
+        logger->error("frame skipped by capture error");
+        return nullptr;
+    }
+
+    logger->info("frame captured");
+    procHandler->FrameCaptured(frame);
+
+    return frame;
+}
+
+bool NeuralNetVision::allocateCudaBuffers()
+{
+    if (!allocBuffers(input->GetWidth(), input->GetHeight(), visualizationFlags))
+    {
+        procHandler->FrameSkipMemoryFault();
+        logger->error("frame skipped by memory fauld");
+        return false;
+    }
+
+    logger->info("buffers allocated - processing for width x height: %d x %d",
+                 input->GetWidth(), input->GetHeight());
+
+    return true;
+}
+
+bool NeuralNetVision::processSegmentation(pixelType *frame)
+{
+    if (!net->Process(frame, input->GetWidth(), input->GetHeight(), ignoreClass.c_str()))
+    {
+        procHandler->FrameSkipNetError();
+        logger->error("the neuralnet failed to process segmentation");
+        return false;
+    }
+
+    logger->info("neuralnet: frame processed");
+
+    // generate overlay
+    if (visualizationFlags & segNet::VISUALIZE_OVERLAY)
+    {
+        if (!net->Overlay(imgOverlay, overlaySize.x, overlaySize.y, filterMode))
+        {
+            procHandler->FrameSkipSegmentationOverlayError();
+            logger->error("the neuralnet failed to process segmentation overlay");
+            return false;
+        }
+    }
+
+    logger->info("neuralnet: overlay");
+
+    // generate mask
+    if (visualizationFlags & segNet::VISUALIZE_MASK)
+    {
+        if (!net->Mask(imgMask, maskSize.x, maskSize.y, filterMode))
+        {
+            procHandler->FrameSkipSegmentationMaskError();
+            logger->error("the neuralnet failed to process segmentation mask");
+            return false;
+        }
+    }
+    logger->info("neuralnet: mask");
+
+    CUDA(cudaDeviceSynchronize());
+    return true;
+}
+
+void NeuralNetVision::loop()
+{
+    pixelType *frame = captureNextFrame();
+    if (frame == NULL)
+        return;
+
+    if (!allocateCudaBuffers())
+        return;
+
+    if (!processSegmentation(frame))
+        return;
+
+    logger->info("frame processed");
+
+    char *occupancyGrid = ocgrid->ComputeOcuppancyGrid(imgMask, maskSize);
+    logger->info("OG computed");
+
+    procHandler->FrameProcessResult(occupancyGrid);
+}
+
 void NeuralNetVision::LoopUntilSignaled()
 {
-    const char *ignoreClass = "void";                                          // TODO
-    const segNet::FilterMode filterMode = segNet::FilterModeFromStr("linear"); // TODO
-
     while (loop_run)
     {
-        pixelType *frame = (pixelType *)input->Capture(10000);
-        if (frame == NULL)
-        {
-            if (!input->IsStreaming())
-                loop_run = false;
-
-            procHandler->FrameSkipCaptureError();
-            logger->error("frame skipped by capture error");
-            continue;
-        }
-
-        logger->info("frame captured");
-        procHandler->FrameCaptured(frame);
-
-        // cv::Mat mask_image_bgr, mask_image_rgb, original_image_bgr, original_image_rgb;
-        // original_image_rgb = cv::Mat(input->GetHeight(), input->GetWidth(), CV_8UC3, frame);
-        // original_image_bgr = cv::Mat(input->GetHeight(), input->GetWidth(), CV_8UC3);
-        // cv::cvtColor(original_image_rgb, original_image_bgr, cv::COLOR_RGB2BGR);
-        // std::string img_name = std::string("frame.png");
-        // cv::imwrite(img_name, original_image_bgr);
-
-        if (!allocBuffers(input->GetWidth(), input->GetHeight(), visualizationFlags))
-        {
-            procHandler->FrameSkipMemoryFault();
-            logger->error("frame skipped by memory fauld");
-            continue;
-        }
-
-        logger->info("buffers allocated - processing for width x height: %d x %d",
-                     input->GetWidth(), input->GetHeight());
-
-        if (!net->Process(frame, input->GetWidth(), input->GetHeight(), ignoreClass))
-        {
-            procHandler->FrameSkipNetError();
-            logger->error("the neuralnet failed to process segmentation");
-            continue;
-        }
-
-        logger->info("neuralnet: frame processed");
-
-        // generate overlay
-        if (visualizationFlags & segNet::VISUALIZE_OVERLAY)
-        {
-            if (!net->Overlay(imgOverlay, overlaySize.x, overlaySize.y, filterMode))
-            {
-                procHandler->FrameSkipSegmentationOverlayError();
-                logger->error("the neuralnet failed to process segmentation overlay");
-                continue;
-            }
-        }
-
-        logger->info("neuralnet: overlay");
-
-        // generate mask
-        if (visualizationFlags & segNet::VISUALIZE_MASK)
-        {
-            if (!net->Mask(imgMask, maskSize.x, maskSize.y, filterMode))
-            {
-                procHandler->FrameSkipSegmentationMaskError();
-                logger->error("the neuralnet failed to process segmentation mask");
-                continue;
-            }
-        }
-        logger->info("neuralnet: mask");
-
-        CUDA(cudaDeviceSynchronize());
-        logger->info("frame processed");
-
-        char *occupancyGrid = ocgrid->ComputeOcuppancyGrid(imgMask, maskSize);
-        logger->info("OG computed");
-
-        procHandler->FrameProcessResult(occupancyGrid);
+        loop();
     }
 }
