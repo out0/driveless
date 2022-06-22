@@ -19,7 +19,7 @@
 #include <jetson-utils/cudaMappedMemory.h>
 #include <jetson-inference/segNet.h>
 
-#include "source_camera_gst.h"
+#include <source_camera_gst.h>
 
 // https://gist.github.com/jungle-cat
 // v4l2-ctl --list-formats-ext -d /dev/video1

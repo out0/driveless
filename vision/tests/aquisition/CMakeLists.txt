@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 2.8)
 
 # declare my-recognition project
-project(usb-camera-hello-world)
+project(usb-camera-tests)
 
 # import jetson-inference and jetson-utils packages.
 # note that if you didn't do "sudo make install"
@@ -22,21 +22,23 @@ include_directories(${CUDA_INCLUDE_DIRS})
 include_directories(${OpenCV_INCLUDE_DIRS})
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(/usr/include/gstreamer-1.0 /usr/lib/aarch64-linux-gnu/gstreamer-1.0/include /usr/include/glib-2.0 /usr/include/libxml2 /usr/lib/aarch64-linux-gnu/glib-2.0/include/)
+include_directories(../../aquisition)
 
 # add directory for libnvbuf-utils to program
 link_directories(/usr/lib/aarch64-linux-gnu/tegra)
 
 # compile the my-recognition program
 SET(TARGET_H
-    camera_drivers/source_camera.h
-    camera_drivers/source_camera_gst.h
+    ../../aquisition/source_camera.h
+    ../../aquisition/source_camera_gst.h
 )
     
 
-cuda_add_executable(usb2file test_usb_to_file.cpp)
-
-cuda_add_executable(usbview test_usb_viewer.cpp)
+cuda_add_executable(usb2file ../../aquisition/test_usb_to_file.cpp)
+cuda_add_executable(usbview ../../aquisition/test_usb_viewer.cpp)
+cuda_add_executable(aqtst ../../aquisition/test_source_dataset.cpp)
 
 # link my-recognition to jetson-inference library
 target_link_libraries(usb2file jetson-inference ${OpenCV_LIBS})
 target_link_libraries(usbview jetson-inference ${OpenCV_LIBS})
+
