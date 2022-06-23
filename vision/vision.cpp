@@ -36,7 +36,7 @@ using namespace chrono;
 typedef uchar3 pixelType;
 
 extern OccupancyGrid *NewOccupancyGridImplInstance();
-extern ProcHandler *NewProcHandlerImplInstance();
+extern ProcHandler *NewProcHandlerImplInstance(Logger *logger);
 NeuralNetVision *visionProc;
 
 #ifdef DEBUG
@@ -63,7 +63,8 @@ int main(int argc, char **argv)
                                ->build();
 
     OccupancyGrid *computeOG = NewOccupancyGridImplInstance();
-    ProcHandler *procHandler = NewProcHandlerImplInstance();
+
+    ProcHandler *procHandler = NewProcHandlerImplInstance(logger);
 
     segNet *net = segNet::Create(nullptr,
                                  "net/hrnet_w18.onnx",

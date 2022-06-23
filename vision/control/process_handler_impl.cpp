@@ -1,8 +1,22 @@
 #include "process_handler.h"
+#include "../streaming/stream_server.h"
 
 class ProcHandlerImpl : public ProcHandler
 {
+    StreamServer *originalFrameStreamServer;
+    StreamServer *segmentedFrameStreamServer;
+
 public:
+    ProcHandlerImpl(Logger *logger) {
+        originalFrameStreamServer = new StreamServer("OriginalFrame", 20000, logger);
+        originalFrameStreamServer->Start();
+    }
+
+    ~ProcHandlerImpl() {
+        originalFrameStreamServer->Stop();
+        delete originalFrameStreamServer;
+    }
+
     void FrameSkipCaptureError() override
     {
     }
@@ -26,4 +40,4 @@ public:
     }
 };
 
-ProcHandler *NewProcHandlerImplInstance() { return new ProcHandlerImpl(); }
+ProcHandler *NewProcHandlerImplInstance(Logger *logger) { return new ProcHandlerImpl(logger); }

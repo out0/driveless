@@ -1,0 +1,9 @@
+{
+    "makefile.extensionOutputFolder": "./.vscode",
+    "files.associations": {
+        "thread": "cpp",
+        "vector": "cpp",
+        "stdexcept": "cpp",
+        "*.tcc": "cpp"
+    }
+}
