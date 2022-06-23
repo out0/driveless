@@ -27,14 +27,23 @@ include_directories(../../**)
 # add directory for libnvbuf-utils to program
 link_directories(/usr/lib/aarch64-linux-gnu/tegra)
 
-# compile the my-recognition program
+# compile
 SET(TARGET_H
     ../../aquisition/source_camera.h
     ../../aquisition/source_camera_gst.h
     ../../aquisition/source_dataset.h
+    ../../segmentation/neuralnet_segmentation.h
+    ../../segmentation/neuralnet_segmentation.h
+    ../../occupancy_grid/occupancy_grid.h
+    ../../control/process_handler.h
+    ../../log/logger.h
 )
     
-cuda_add_executable(aqtst neuralnet_segmentation_test.cpp)
+cuda_add_executable(aqtst 
+    neuralnet_segmentation_test.cpp 
+    ../../log/logger_debug_stdout.cpp 
+    ../../segmentation/neuralnet_segmentation.cpp
+)
 
 # link my-recognition to jetson-inference library
 target_link_libraries(aqtst jetson-inference ${OpenCV_LIBS})

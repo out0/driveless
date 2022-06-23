@@ -16,7 +16,7 @@
 #include <jetson-inference/segNet.h>
 
 #include "../aquisition/source_camera_gst.h"
-#include "../ocupancy_grid/occupancy_grid.h"
+#include "../occupancy_grid/occupancy_grid.h"
 #include "../control/process_handler.h"
 #include "../log/logger.h"
 #include "../segmentation/neuralnet_segmentation.h"

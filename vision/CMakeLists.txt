@@ -31,7 +31,7 @@ SET(TARGET_H
     aquisition/source_camera.h
     aquisition/source_camera_usb.h
     control/process_handler.h
-    ocupancy_grid/ocupancy_grid.h
+    occupancy_grid/ocupancy_grid.h
     log/logger.h
     segmentation/neuralnet_segmentation.h
 )
