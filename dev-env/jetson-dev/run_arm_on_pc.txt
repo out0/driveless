@@ -1,0 +1,2 @@
+# Install the qemu packages  
+sudo apt-get install qemu binfmt-support qemu-user-static 

@@ -1,0 +1,18 @@
+# Setup Vino to accept incomming connections
+
+gsettings set org.gnome.Vino prompt-enabled false
+gsettings set org.gnome.Vino  require-encryption true
+export DISPLAY=:0 && /usr/lib/vino/vino-server 
+
+# Edit Xorg to add a virtual DISPLAY
+
+Section "Screen"
+    Identifier "Default Screen"
+    Monitor "Configured Monitor"
+    Device "Tegra0"
+    SubSection "Display"
+        Depth 24
+        Virtual 1920 1080 # Modify the resolution by editing these values
+    EndSubSection
+EndSection
+
