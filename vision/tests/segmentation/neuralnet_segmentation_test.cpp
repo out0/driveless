@@ -4,7 +4,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../aquisition/source_dataset.h"
+#include "../../acquisition/source_dataset.h"
 #include "../../segmentation/neuralnet_segmentation.h"
 #include "../../occupancy_grid/occupancy_grid.h"
 #include "../../control/process_handler.h"

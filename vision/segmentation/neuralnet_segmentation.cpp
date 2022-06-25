@@ -106,7 +106,7 @@ pixelType *NeuralNetVision::captureNextFrame()
     }
 
     logger->info("frame captured");
-    procHandler->FrameCaptured(frame);
+    procHandler->FrameCaptured(frame, input->GetWidth(), input->GetHeight());
 
     return frame;
 }

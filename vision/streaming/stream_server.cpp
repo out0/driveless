@@ -1,14 +1,6 @@
 
 #include "stream_server.h"
 
-#include <stdio.h>
-#include <iostream>
-#include <vector>
-#include <sys/socket.h>
-#include <netinet/in.h>
-#include <arpa/inet.h>
-#include <unistd.h>
-
 static void listener(StreamServer *streamServer);
 
 StreamServer::StreamServer(string serviceName, int listenPort, Logger *logger)
@@ -121,9 +113,10 @@ bool StreamServer::CreateOutputStream(string *clientIP, int clientPort)
 
     videoOutput *outputStream = videoOutput::Create(uri, options);
     this->clients->push_back(outputStream);
+    return outputStream != NULL;
 }
 
-void StreamServer::NewFrame(uchar3 *frame, int width, int height)
+void StreamServer::NewFrame(uchar3 *frame, uint32_t width, uint32_t height)
 {
     if (!active || this->clients->size() == 0)
         return;

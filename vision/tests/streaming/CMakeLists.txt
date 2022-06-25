@@ -1,18 +1,11 @@
 # require CMake 2.8 or greater
 cmake_minimum_required(VERSION 2.8)
 
-# declare my-recognition project
-project(driveless-vision-module)
+project(stream-test)
 
 # import jetson-inference and jetson-utils packages.
 # note that if you didn't do "sudo make install"
 # while building jetson-inference, this will error.
-find_package(jetson-utils REQUIRED)
-find_package(jetson-inference REQUIRED)
-find_package(OpenCV REQUIRED)
-
-# CUDA is required
-find_package(CUDA)
 
 message(STATUS "OpenCV_INCLUDE_DIRS = ${OpenCV_INCLUDE_DIRS}")
 message(STATUS "OpenCV_LIBS = ${OpenCV_LIBS}")
@@ -26,24 +19,16 @@ include_directories(/usr/include/gstreamer-1.0 /usr/lib/aarch64-linux-gnu/gstrea
 link_directories(/usr/lib/aarch64-linux-gnu/tegra)
 
 SET(TARGET_H
-    acquisition/source_camera.h
-    acquisition/source_camera_usb.h
-    control/process_handler.h
-    occupancy_grid/occupancy_grid.h
-    log/logger.h
-    segmentation/neuralnet_segmentation.h
-    streaming/stream_server.h
+    ../../log/logger.h
+    ../../streaming/stream_client.h
 )
 
-cuda_add_executable(
-    vision 
-    vision.cpp 
-    occupancy_grid/occupancy_grid_impl.cpp 
-    control/process_handler_impl.cpp 
-    log/logger_debug_stdout.cpp 
-    segmentation/neuralnet_segmentation.cpp
-    streaming/stream_server.cpp
+add_executable(
+    stream_tst
+    test_receive_streams.cpp
+    ../../log/logger_debug_stdout.cpp
+    ../../streaming/stream_client.cpp
 )
 
 # link my-recognition to jetson-inference library
-target_link_libraries(vision jetson-inference ${OpenCV_LIBS})
+target_link_libraries(stream_tst)

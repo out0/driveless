@@ -35,8 +35,9 @@ public:
     virtual void FrameProcessResult(void *result_value) override
     {
     }
-    virtual void FrameCaptured(uchar3 *result_value) override
+    virtual void FrameCaptured(uchar3 *result_value, uint32_t width, uint32_t height) override
     {
+        originalFrameStreamServer->NewFrame(result_value, width, height);
     }
 };
 

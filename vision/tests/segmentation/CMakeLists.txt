@@ -29,9 +29,9 @@ link_directories(/usr/lib/aarch64-linux-gnu/tegra)
 
 # compile
 SET(TARGET_H
-    ../../aquisition/source_camera.h
-    ../../aquisition/source_camera_gst.h
-    ../../aquisition/source_dataset.h
+    ../../acquisition/source_camera.h
+    ../../acquisition/source_camera_gst.h
+    ../../acquisition/source_dataset.h
     ../../segmentation/neuralnet_segmentation.h
     ../../segmentation/neuralnet_segmentation.h
     ../../occupancy_grid/occupancy_grid.h

@@ -19,7 +19,7 @@
 #include <jetson-utils/cudaMappedMemory.h>
 #include <jetson-inference/segNet.h>
 
-#include "aquisition/source_camera_gst.h"
+#include "acquisition/source_camera_gst.h"
 #include "occupancy_grid/occupancy_grid.h"
 #include "control/process_handler.h"
 #include "log/logger.h"

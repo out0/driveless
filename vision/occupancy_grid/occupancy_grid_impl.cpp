@@ -219,6 +219,7 @@ public:
                 }
             }
         }
+        return grid;
     }
 };
 
