@@ -18,12 +18,29 @@
 
 using namespace std;
 
+class StreamClient {
+public:    
+    videoOutput * stream;
+    const char *clientIP;
+    int clientPort;
+
+    StreamClient(const char * clientIP, int clientPort, videoOutput * stream) {
+        this->clientIP = clientIP;
+        this->clientPort = clientPort;
+        this->stream = stream;
+    }
+
+    ~StreamClient() {
+        delete stream;
+        delete clientIP;
+    }
+};
+
 class StreamServer
 {
 private:
-    videoOutput *outputStream;
     int listenPort;
-    vector<videoOutput *> *clients;
+    vector<StreamClient *> *clients;
     thread *main;
     Logger *logger;
     ProcHandler *procHandler;
@@ -39,9 +56,10 @@ public:
     void Wait();
     bool IsActive();
     int GetListenerDescriptor();
-    void OnNoAccept(string*clientIP);
-    void OnStreaming(string *clientIP, int clientPort);
-    bool CreateOutputStream(string *clientIP, int clientPort);
+    void OnNoAccept(string *clientIP);
+    void OnStreaming(string clientIP, int clientPort);
+    bool CheckOutputStreamExists(string clientIP,  int clientPort);
+    void CreateOutputStream(string clientIP, int clientPort);
     void NewFrame(uchar3 *frame, uint32_t width, uint32_t height);
 };
 

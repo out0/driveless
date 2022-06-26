@@ -20,7 +20,7 @@ int main (int argc, char **argv) {
         return 0;
     }       
 
-    int localPort = atoi(argv[2]);
+    int localPort = atoi(argv[4]);
     
     if((localPort > 65535) || (localPort < 2000))
     {

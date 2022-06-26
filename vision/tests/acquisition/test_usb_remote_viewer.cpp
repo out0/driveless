@@ -11,7 +11,7 @@
 #include <jetson-utils/cudaOverlay.h>
 #include <jetson-utils/cudaMappedMemory.h>
 #include <jetson-inference/segNet.h>
-#include <source_camera_gst.h>
+#include <../../acquisition/source_camera_gst.h>
 
 // v4l2-ctl --list-formats-ext -d /dev/video1
 
@@ -42,8 +42,8 @@ int main(int argc, char **argv)
                                ->build();
 
     videoOptions options;
-    videoOutput *outputStream = videoOutput::Create("rtp://10.0.0.161:20000", options);
-    videoOutput *outputStream2 = videoOutput::Create("rtp://10.0.0.161:20001", options);
+    videoOutput *outputStream = videoOutput::Create("rtp://10.0.0.154:20000", options);
+    videoOutput *outputStream2 = videoOutput::Create("rtp://10.0.0.154:20001", options);
 
     while (!signal_received)
     {

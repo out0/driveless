@@ -183,7 +183,7 @@ void NeuralNetVision::loop()
     char *occupancyGrid = ocgrid->ComputeOcuppancyGrid(imgMask, maskSize);
     logger->info("OG computed");
 
-    procHandler->FrameProcessResult(occupancyGrid);
+   procHandler->FrameProcessResult(occupancyGrid);
 }
 
 void NeuralNetVision::LoopUntilSignaled()

@@ -3,7 +3,7 @@
 
 static void listener(StreamServer *streamServer);
 
-StreamServer::StreamServer(string serviceName, int listenPort, Logger *logger)
+StreamServer::StreamServer(std::string serviceName, int listenPort, Logger *logger)
 {
     if (listenPort <= 0)
     {
@@ -13,10 +13,9 @@ StreamServer::StreamServer(string serviceName, int listenPort, Logger *logger)
     {
         throw invalid_argument("please provide a valid non null logger");
     }
-    this->outputStream = outputStream;
     this->listenPort = listenPort;
 
-    this->clients = new vector<videoOutput *>();
+    this->clients = new vector<StreamClient *>();
     this->main = nullptr;
     this->serviceName = serviceName;
     this->active = false;
@@ -66,9 +65,9 @@ void StreamServer::OnNoAccept(string *clientIP)
     logger->warning("Unable to accept connection from client %s on port %d for service %s", clientIP->c_str(), listenPort, serviceName.c_str());
 }
 
-void StreamServer::OnStreaming(string *clientIP, int clientPort)
+void StreamServer::OnStreaming(string clientIP, int clientPort)
 {
-    logger->info("Streaming %s to %s:%d", serviceName.c_str(), clientIP->c_str(), clientPort);
+    logger->info("Streaming %s to %s:%d", serviceName.c_str(), clientIP.c_str(), clientPort);
 }
 static void listener(StreamServer *streamServer)
 {
@@ -87,48 +86,82 @@ static void listener(StreamServer *streamServer)
         }
         else
         {
-            const int MAX = 256;
-            char buffer[MAX];
+            char *buffer = (char *)malloc(sizeof(char) * 1024);
+            bzero(buffer, 1024);
+            recv(connFd, buffer, 1024, 0);
+            sleep(0.1);
 
-            bzero(buffer, MAX);
-            recv(connFd, buffer, MAX, 0);
-            string *clientIP = new string(buffer);
+            char *port_buffer = (char *)malloc(sizeof(char) * 1024);
+            bzero(port_buffer, 1024);
+            recv(connFd, port_buffer, 1024, 0);
+            int clientPort = atoi(port_buffer);
 
-            bzero(buffer, MAX);
-            recv(connFd, buffer, MAX, 0);
-            int clientPort = atoi(buffer);
+            
+            std::string ip = string(buffer);
 
-            streamServer->CreateOutputStream(clientIP, clientPort);
-            streamServer->OnStreaming(clientIP, clientPort);
+            if (!streamServer->CheckOutputStreamExists(ip, clientPort))
+            {
+                streamServer->CreateOutputStream(ip, clientPort);
+                streamServer->OnStreaming(string(buffer), clientPort);
+            }
+            close(connFd);
         }
     }
 }
 
-bool StreamServer::CreateOutputStream(string *clientIP, int clientPort)
+bool StreamServer::CheckOutputStreamExists(string clientIP, int clientPort)
 {
-    int len = sizeof(char) * (clientIP->size()) + 20;
-    char *uri = (char *)malloc(len);
-    snprintf(uri, len, "rtp://%s:%d", clientIP->c_str(), clientPort);
-    videoOptions options;
+    for (StreamClient *sc : *this->clients)
+    {
+        if (string(sc->clientIP) == clientIP && sc->clientPort == clientPort)
+        {
+            std::cout << "client exists: " << clientIP << ":" << clientPort << std::endl;
+            return true;
+        }
+    }
+    return false;
+}
 
-    videoOutput *outputStream = videoOutput::Create(uri, options);
-    this->clients->push_back(outputStream);
-    return outputStream != NULL;
+void StreamServer::CreateOutputStream(string clientIP, int clientPort)
+{
+    int len = 1024;
+    char *uri = (char *)malloc(len);
+    bzero(uri, 1024);
+    snprintf(uri, len, "rtp://%s:%d", clientIP.c_str(), clientPort);
+
+    videoOptions options;
+    StreamClient *sc = new StreamClient(clientIP.c_str(), clientPort, videoOutput::Create(uri, options));
+
+    this->clients->push_back(sc);
 }
 
 void StreamServer::NewFrame(uchar3 *frame, uint32_t width, uint32_t height)
 {
+
     if (!active || this->clients->size() == 0)
         return;
-    for (videoOutput *outputStream : *this->clients)
-    {
-        if (outputStream != nullptr && outputStream->IsStreaming())
-        {
-            outputStream->Render(frame, width, height);
 
-            char str[256];
-            sprintf(str, "Video Viewer (%ux%u) | %.1f FPS", width, height, outputStream->GetFrameRate());
-            outputStream->SetStatus(str);
+    for (std::vector<StreamClient *>::iterator itr = this->clients->begin(); itr != this->clients->end(); ++itr)
+    {
+        StreamClient *sc = *itr;
+        if (sc->stream == nullptr)
+        {
+            this->clients->erase(itr);
+            delete sc;
+            continue;
+        }
+
+        sc->stream->Render(frame, width, height);
+
+        char str[256];
+        sprintf(str, "Video Viewer (%ux%u) | %.1f FPS", width, height, sc->stream->GetFrameRate());
+        sc->stream->SetStatus(str);
+
+        if (!sc->stream->IsStreaming())
+        {
+            sc->stream->Close();
+            this->clients->erase(itr);
+            delete sc;
         }
     }
 }
@@ -141,10 +174,10 @@ void StreamServer::Stop()
     active = false;
     close(listenerFd);
 
-    for (videoOutput *outputStream : *this->clients)
+    for (StreamClient *sc : *this->clients)
     {
-        outputStream->Close();
-        delete outputStream;
+        sc->stream->Close();
+        delete sc;
     }
 
     this->clients->clear();

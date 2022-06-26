@@ -77,6 +77,7 @@ int main(int argc, char **argv)
                                  deviceType::DEVICE_GPU,
                                  true);
 
+    //segNet *net = nullptr;
     visionProc = new NeuralNetVision(camera, net, computeOG, procHandler, logger);
 
     if (signal(SIGINT, sig_handler) == SIG_ERR)

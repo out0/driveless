@@ -12,7 +12,7 @@
 #include <jetson-utils/cudaMappedMemory.h>
 #include <jetson-inference/segNet.h>
 #include <jetson-utils/glDisplay.h>
-#include <source_camera_gst.h>
+#include <../../acquisition/source_camera_gst.h>
 
 // v4l2-ctl --list-formats-ext -d /dev/video1
 

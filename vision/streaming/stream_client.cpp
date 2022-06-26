@@ -42,9 +42,11 @@ void StreamClient::openConnection()
     }
 
     write(connFd, localIP.c_str(), localIP.size());
+    sleep(0.5);
+    
     std::string port = std::to_string(localPort);
     write(connFd, port.c_str(), port.size());
-
+    std::cout << "sent: " << localIP << ":" << port << std::endl;
     close(connFd);
 }
 

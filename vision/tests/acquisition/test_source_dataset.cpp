@@ -4,7 +4,7 @@
 
 #include <stdlib.h>
 #include <string.h>
-#include <source_dataset.h>
+#include <../../acquisition/source_dataset.h>
 #include "image_utils.h"
 
 // v4l2-ctl --list-formats-ext -d /dev/video1
