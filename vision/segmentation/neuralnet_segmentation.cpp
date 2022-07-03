@@ -92,9 +92,9 @@ void NeuralNetVision::Terminate()
     loop_run = false;
 }
 
-pixelType *NeuralNetVision::captureNextFrame()
+SourceImageFormat *NeuralNetVision::captureNextFrame()
 {
-    pixelType *frame = (pixelType *)input->Capture(10000);
+    SourceImageFormat *frame = (SourceImageFormat *)input->Capture(10000);
     if (frame == NULL)
     {
         if (!input->IsStreaming())
@@ -104,9 +104,6 @@ pixelType *NeuralNetVision::captureNextFrame()
         logger->error("frame skipped by capture error");
         return nullptr;
     }
-
-    logger->info("frame captured");
-    procHandler->FrameCaptured(frame, input->GetWidth(), input->GetHeight());
 
     return frame;
 }
@@ -126,7 +123,7 @@ bool NeuralNetVision::allocateCudaBuffers()
     return true;
 }
 
-bool NeuralNetVision::processSegmentation(pixelType *frame)
+bool NeuralNetVision::processSegmentation(SourceImageFormat *frame)
 {
     if (!net->Process(frame, input->GetWidth(), input->GetHeight(), ignoreClass.c_str()))
     {
@@ -168,22 +165,26 @@ bool NeuralNetVision::processSegmentation(pixelType *frame)
 
 void NeuralNetVision::loop()
 {
-    pixelType *frame = captureNextFrame();
+    if (!allocateCudaBuffers())
+         return;
+
+    SourceImageFormat *frame = captureNextFrame();
     if (frame == NULL)
         return;
 
-    if (!allocateCudaBuffers())
-        return;
+    logger->info("frame captured");
+    procHandler->FrameCaptured(frame, input->GetWidth(), input->GetHeight());
 
-    if (!processSegmentation(frame))
-        return;
+
+    // if (!processSegmentation(frame))
+    //     return;
 
     logger->info("frame processed");
 
-    char *occupancyGrid = ocgrid->ComputeOcuppancyGrid(imgMask, maskSize);
-    logger->info("OG computed");
+    // char *occupancyGrid = ocgrid->ComputeOcuppancyGrid(imgMask, maskSize);
+    // logger->info("OG computed");
 
-   procHandler->FrameProcessResult(occupancyGrid);
+    //    procHandler->FrameProcessResult(occupancyGrid);
 }
 
 void NeuralNetVision::LoopUntilSignaled()

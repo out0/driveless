@@ -15,6 +15,7 @@
 
 #include "../log/logger.h"
 #include "../control/process_handler.h"
+#include "../model/vision_formats.h"
 
 using namespace std;
 
@@ -56,11 +57,11 @@ public:
     void Wait();
     bool IsActive();
     int GetListenerDescriptor();
-    void OnNoAccept(string *clientIP);
-    void OnStreaming(string clientIP, int clientPort);
-    bool CheckOutputStreamExists(string clientIP,  int clientPort);
-    void CreateOutputStream(string clientIP, int clientPort);
-    void NewFrame(uchar3 *frame, uint32_t width, uint32_t height);
+    void OnNoAccept(const char *clientIP);
+    void OnStreaming(const char * clientIP, int clientPort);
+    bool CheckOutputStreamExists(const char * clientIP,  int clientPort);
+    void CreateOutputStream(const char * clientIP, int clientPort);
+    void NewFrame(SourceImageFormat *frame, uint32_t width, uint32_t height);
 };
 
 #endif

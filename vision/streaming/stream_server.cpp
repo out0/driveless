@@ -19,6 +19,7 @@ StreamServer::StreamServer(std::string serviceName, int listenPort, Logger *logg
     this->main = nullptr;
     this->serviceName = serviceName;
     this->active = false;
+    this->logger = logger;
 }
 void StreamServer::Start()
 {
@@ -60,14 +61,14 @@ int StreamServer::GetListenerDescriptor()
 {
     return this->listenerFd;
 }
-void StreamServer::OnNoAccept(string *clientIP)
+void StreamServer::OnNoAccept(const char *clientIP)
 {
-    logger->warning("Unable to accept connection from client %s on port %d for service %s", clientIP->c_str(), listenPort, serviceName.c_str());
+    logger->warning("Unable to accept connection from client %s on port %d for service %s", clientIP, listenPort, serviceName.c_str());
 }
 
-void StreamServer::OnStreaming(string clientIP, int clientPort)
+void StreamServer::OnStreaming(const char *clientIP, int clientPort)
 {
-    logger->info("Streaming %s to %s:%d", serviceName.c_str(), clientIP.c_str(), clientPort);
+    logger->info("Streaming %s to %s:%d", serviceName.c_str(), clientIP, clientPort);
 }
 static void listener(StreamServer *streamServer)
 {
@@ -82,38 +83,32 @@ static void listener(StreamServer *streamServer)
 
         if (connFd < 0)
         {
-            streamServer->OnNoAccept(new string(inet_ntoa(clientAddr.sin_addr)));
+            streamServer->OnNoAccept(inet_ntoa(clientAddr.sin_addr));
         }
         else
         {
-            char *buffer = (char *)malloc(sizeof(char) * 1024);
-            bzero(buffer, 1024);
-            recv(connFd, buffer, 1024, 0);
-            sleep(0.1);
-
             char *port_buffer = (char *)malloc(sizeof(char) * 1024);
             bzero(port_buffer, 1024);
             recv(connFd, port_buffer, 1024, 0);
             int clientPort = atoi(port_buffer);
 
-            
-            std::string ip = string(buffer);
+            char *ip = inet_ntoa(clientAddr.sin_addr);
 
             if (!streamServer->CheckOutputStreamExists(ip, clientPort))
             {
                 streamServer->CreateOutputStream(ip, clientPort);
-                streamServer->OnStreaming(string(buffer), clientPort);
+                streamServer->OnStreaming(ip, clientPort);
             }
             close(connFd);
         }
     }
 }
 
-bool StreamServer::CheckOutputStreamExists(string clientIP, int clientPort)
+bool StreamServer::CheckOutputStreamExists(const char *clientIP, int clientPort)
 {
     for (StreamClient *sc : *this->clients)
     {
-        if (string(sc->clientIP) == clientIP && sc->clientPort == clientPort)
+        if (strcmp(sc->clientIP, clientIP) == 0 && sc->clientPort == clientPort)
         {
             std::cout << "client exists: " << clientIP << ":" << clientPort << std::endl;
             return true;
@@ -122,20 +117,26 @@ bool StreamServer::CheckOutputStreamExists(string clientIP, int clientPort)
     return false;
 }
 
-void StreamServer::CreateOutputStream(string clientIP, int clientPort)
+void StreamServer::CreateOutputStream(const char *clientIP, int clientPort)
 {
     int len = 1024;
     char *uri = (char *)malloc(len);
     bzero(uri, 1024);
-    snprintf(uri, len, "rtp://%s:%d", clientIP.c_str(), clientPort);
+    snprintf(uri, len, "rtp://%s:%d", clientIP, clientPort);
 
     videoOptions options;
-    StreamClient *sc = new StreamClient(clientIP.c_str(), clientPort, videoOutput::Create(uri, options));
+    options.width = 800;
+    options.height = 600;
+    options.zeroCopy = true;
+    options.deviceType = videoOptions::DEVICE_FILE;
+    options.ioType = videoOptions::OUTPUT;
+    options.codec = videoOptions::CODEC_H264;
+    StreamClient *sc = new StreamClient(clientIP, clientPort, videoOutput::Create(uri, options));
 
     this->clients->push_back(sc);
 }
 
-void StreamServer::NewFrame(uchar3 *frame, uint32_t width, uint32_t height)
+void StreamServer::NewFrame(SourceImageFormat *frame, uint32_t width, uint32_t height)
 {
 
     if (!active || this->clients->size() == 0)
@@ -146,6 +147,7 @@ void StreamServer::NewFrame(uchar3 *frame, uint32_t width, uint32_t height)
         StreamClient *sc = *itr;
         if (sc->stream == nullptr)
         {
+            std::cout << "deleting streaming\n";
             this->clients->erase(itr);
             delete sc;
             continue;

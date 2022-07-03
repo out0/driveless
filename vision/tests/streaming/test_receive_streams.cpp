@@ -6,9 +6,9 @@
 extern Logger *NewDebugLoggerInstance();
 
 int main (int argc, char **argv) {
-    if(argc < 5)
+    if(argc < 4)
     {
-        cerr<<"Syntax : ./client <host> <port> <local_ip> <local_port>"<<endl;
+        cerr<<"Syntax : ./client <host> <port> <local_port>"<<endl;
         return 0;
     }
     
@@ -20,7 +20,7 @@ int main (int argc, char **argv) {
         return 0;
     }       
 
-    int localPort = atoi(argv[4]);
+    int localPort = atoi(argv[3]);
     
     if((localPort > 65535) || (localPort < 2000))
     {
@@ -29,6 +29,6 @@ int main (int argc, char **argv) {
     }       
 
     Logger *logger = NewDebugLoggerInstance();
-    StreamClient *client = new StreamClient(logger, std::string(argv[1]), serverPort, std::string(argv[3]), localPort);
+    StreamClient *client = new StreamClient(logger, std::string(argv[1]), serverPort, localPort);
     client->RequestStreamAccess();
 }

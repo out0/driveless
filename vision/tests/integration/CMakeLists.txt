@@ -26,25 +26,26 @@ include_directories(/usr/include/gstreamer-1.0 /usr/lib/aarch64-linux-gnu/gstrea
 link_directories(/usr/lib/aarch64-linux-gnu/tegra)
 
 SET(TARGET_H
-    model/vision_formats.h
-    acquisition/source_camera.h
-    acquisition/source_camera_usb.h
-    control/process_handler.h
-    occupancy_grid/occupancy_grid.h
-    log/logger.h
-    segmentation/neuralnet_segmentation.h
-    streaming/stream_server.h
+    ../../model/vision_formats.h
+    ../../acquisition/source_camera.h
+    ../../acquisition/source_dataset.h
+    ../../acquisition/source_camera_gst.h
+    ../../control/process_handler.h
+    ../../log/logger.h
+    ../../segmentation/neuralnet_segmentation.h
+    ../../streaming/stream_server.h
 )
 
+
 cuda_add_executable(
-    vision 
+    vision-tst
     vision.cpp 
-    occupancy_grid/occupancy_grid_impl.cpp 
-    control/process_handler_impl.cpp 
-    log/logger_debug_stdout.cpp 
-    segmentation/neuralnet_segmentation.cpp
-    streaming/stream_server.cpp
+    ../../occupancy_grid/occupancy_grid_impl.cpp 
+    ../../control/process_handler_impl.cpp 
+    ../../log/logger_debug_stdout.cpp 
+    ../../segmentation/neuralnet_segmentation.cpp
+    ../../streaming/stream_server.cpp
 )
 
 # link my-recognition to jetson-inference library
-target_link_libraries(vision jetson-inference ${OpenCV_LIBS})
+target_link_libraries(vision-tst jetson-inference ${OpenCV_LIBS})

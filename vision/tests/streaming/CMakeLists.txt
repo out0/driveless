@@ -19,6 +19,7 @@ include_directories(/usr/include/gstreamer-1.0 /usr/lib/aarch64-linux-gnu/gstrea
 link_directories(/usr/lib/aarch64-linux-gnu/tegra)
 
 SET(TARGET_H
+    ../../model/vision_formats.h
     ../../log/logger.h
     ../../streaming/stream_client.h
 )

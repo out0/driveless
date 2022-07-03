@@ -20,7 +20,6 @@ class StreamClient
 private:
     std::string streamerIP;
     int streamerPort;
-    std::string localIP;
     int localPort;
     int connFd;
     struct sockaddr_in serverAddr;
@@ -29,7 +28,7 @@ private:
     void openConnection();
 
 public:
-    StreamClient(Logger *logger, std::string streamerIP, int streamerPort, std::string localIP, int localPort);
+    StreamClient(Logger *logger, std::string streamerIP, int streamerPort,  int localPort);
     ~StreamClient();
     void RequestStreamAccess();
 };

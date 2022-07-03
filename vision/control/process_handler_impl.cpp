@@ -1,6 +1,9 @@
 #include "process_handler.h"
 #include "../streaming/stream_server.h"
 
+#include <jetson-utils/cudaMappedMemory.h>
+
+
 class ProcHandlerImpl : public ProcHandler
 {
     StreamServer *originalFrameStreamServer;
@@ -35,7 +38,7 @@ public:
     virtual void FrameProcessResult(void *result_value) override
     {
     }
-    virtual void FrameCaptured(uchar3 *result_value, uint32_t width, uint32_t height) override
+    virtual void FrameCaptured(SourceImageFormat *result_value, uint32_t width, uint32_t height) override
     {
         originalFrameStreamServer->NewFrame(result_value, width, height);
     }

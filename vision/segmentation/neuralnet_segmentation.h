@@ -21,8 +21,6 @@
 #include "../log/logger.h"
 #include "../segmentation/neuralnet_segmentation.h"
 
-typedef uchar3 pixelType;
-
 class NeuralNetVision
 {
 private:
@@ -32,10 +30,10 @@ private:
     ProcHandler *procHandler;
     Logger *logger;
     bool loop_run;
-    pixelType *imgMask = NULL;      // color of each segmentation class
-    pixelType *imgOverlay = NULL;   // input + alpha-blended mask
-    pixelType *imgComposite = NULL; // overlay with mask next to it
-    pixelType *imgOutput = NULL;    // reference to one of the above three
+    SourceImageFormat *imgMask = NULL;      // color of each segmentation class
+    SourceImageFormat *imgOverlay = NULL;   // input + alpha-blended mask
+    SourceImageFormat *imgComposite = NULL; // overlay with mask next to it
+    SourceImageFormat *imgOutput = NULL;    // reference to one of the above three
     uint32_t visualizationFlags;
 
     int2 maskSize;
@@ -49,8 +47,8 @@ private:
 protected:
     bool allocBuffers(int width, int height, uint32_t flags);
     bool allocateCudaBuffers();
-    pixelType *captureNextFrame();
-    bool processSegmentation(pixelType *frame);
+    SourceImageFormat *captureNextFrame();
+    bool processSegmentation(SourceImageFormat *frame);
     void loop();
 
 public:

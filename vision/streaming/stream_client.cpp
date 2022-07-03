@@ -1,11 +1,10 @@
 #include "stream_client.h"
 
-StreamClient::StreamClient(Logger *logger, std::string streamerIP, int streamerPort, std::string localIP, int localPort)
+StreamClient::StreamClient(Logger *logger, std::string streamerIP, int streamerPort, int localPort)
 {
     this->logger = logger;
     this->streamerIP = streamerIP;
     this->streamerPort = streamerPort;
-    this->localIP = localIP;
     this->localPort = localPort;
 }
 
@@ -41,12 +40,12 @@ void StreamClient::openConnection()
         return;
     }
 
-    write(connFd, localIP.c_str(), localIP.size());
-    sleep(0.5);
+    //write(connFd, localIP.c_str(), localIP.size());
+    //sleep(0.5);
     
     std::string port = std::to_string(localPort);
     write(connFd, port.c_str(), port.size());
-    std::cout << "sent: " << localIP << ":" << port << std::endl;
+    std::cout << "sent: " << port << std::endl;
     close(connFd);
 }
 
