@@ -165,16 +165,12 @@ bool NeuralNetVision::processSegmentation(SourceImageFormat *frame)
 
 void NeuralNetVision::loop()
 {
-    if (!allocateCudaBuffers())
-         return;
-
     SourceImageFormat *frame = captureNextFrame();
     if (frame == NULL)
         return;
 
     logger->info("frame captured");
     procHandler->FrameCaptured(frame, input->GetWidth(), input->GetHeight());
-
 
     // if (!processSegmentation(frame))
     //     return;
@@ -184,11 +180,14 @@ void NeuralNetVision::loop()
     // char *occupancyGrid = ocgrid->ComputeOcuppancyGrid(imgMask, maskSize);
     // logger->info("OG computed");
 
-    //    procHandler->FrameProcessResult(occupancyGrid);
+    // procHandler->FrameProcessResult(occupancyGrid);
 }
 
 void NeuralNetVision::LoopUntilSignaled()
 {
+    if (!allocateCudaBuffers())
+        return;
+
     while (loop_run)
     {
         loop();

@@ -64,7 +64,7 @@ int main(int argc, char **argv)
     //                            ->withSize(640, 480)
     //                            ->build();
 
-    SourceCamera *camera = (new SourceCameraDatasetImpl(800, 600))
+    SourceCamera *camera = (new SourceCameraDatasetImpl(800, 600, 30))
                                 ->AddSource(basePath + "/0.png")
                                 ->AddSource(basePath + "/1.png")
                                 ->AddSource(basePath + "/2.png")
@@ -72,24 +72,25 @@ int main(int argc, char **argv)
                                 ->AddSource(basePath + "/4.png")
                                 ->AddSource(basePath + "/5.png")
                                 ->AddSource(basePath + "/6.png")
-                                ->AddSource(basePath + "/7.png");
+                                ->AddSource(basePath + "/7.png")
+                                ->RepeatFrame(30);
                                 
     OccupancyGrid *computeOG = NewOccupancyGridImplInstance();
 
     ProcHandler *procHandler = NewProcHandlerImplInstance(logger);
 
-    // segNet *net = segNet::Create(nullptr,
-    //                              "net/hrnet_w18.onnx",
-    //                              "net/classes.txt",
-    //                              "net/colors.txt",
-    //                              "input.1",
-    //                              "3545",
-    //                              1000,
-    //                              precisionType::TYPE_INT8,
-    //                              deviceType::DEVICE_GPU,
-    //                              true);
+    segNet *net = segNet::Create(nullptr,
+                                 "net/hrnet_w18.onnx",
+                                 "net/classes.txt",
+                                 "net/colors.txt",
+                                 "input.1",
+                                 "3545",
+                                 1000,
+                                 precisionType::TYPE_INT8,
+                                 deviceType::DEVICE_GPU,
+                                 true);
 
-    segNet *net = nullptr;
+    //segNet *net = nullptr;
     visionProc = new NeuralNetVision(camera, net, computeOG, procHandler, logger);
 
     if (signal(SIGINT, sig_handler) == SIG_ERR)
