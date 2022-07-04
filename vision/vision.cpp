@@ -71,14 +71,13 @@ int main(int argc, char **argv)
                                  "net/hrnet_w18.onnx",
                                  "net/classes.txt",
                                  "net/colors.txt",
-                                 "input.1",
-                                 "3545",
-                                 1000,
-                                 precisionType::TYPE_INT8,
+                                 "data",
+                                 "score_fr_21_classes",
+                                 10,
+                                 precisionType::TYPE_FP16,
                                  deviceType::DEVICE_GPU,
                                  true);
 
-    //segNet *net = nullptr;
     visionProc = new NeuralNetVision(camera, net, computeOG, procHandler, logger);
 
     if (signal(SIGINT, sig_handler) == SIG_ERR)

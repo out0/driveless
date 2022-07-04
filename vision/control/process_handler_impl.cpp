@@ -12,12 +12,16 @@ class ProcHandlerImpl : public ProcHandler
 public:
     ProcHandlerImpl(Logger *logger) {
         originalFrameStreamServer = new StreamServer("OriginalFrame", 20000, logger);
+        segmentedFrameStreamServer = new StreamServer("SegmentedFrame", 20001, logger);
         originalFrameStreamServer->Start();
+        segmentedFrameStreamServer->Start();
     }
 
     ~ProcHandlerImpl() {
         originalFrameStreamServer->Stop();
+        segmentedFrameStreamServer->Stop();
         delete originalFrameStreamServer;
+        delete segmentedFrameStreamServer;
     }
 
     void FrameSkipCaptureError() override
@@ -35,13 +39,19 @@ public:
     virtual void FrameSkipSegmentationMaskError() override
     {
     }
-    virtual void FrameProcessResult(void *result_value) override
+    virtual void FrameProcessResult(char *result_value, uint32_t width, uint32_t height) override
     {
     }
     virtual void FrameCaptured(SourceImageFormat *result_value, uint32_t width, uint32_t height) override
     {
         originalFrameStreamServer->NewFrame(result_value, width, height);
     }
+    virtual void FrameSegmentationSuccess(SourceImageFormat *result_value, uint32_t width, uint32_t height) override
+    {
+        segmentedFrameStreamServer->NewFrame(result_value, width, height);
+    }
+
+    
 };
 
 ProcHandler *NewProcHandlerImplInstance(Logger *logger) { return new ProcHandlerImpl(logger); }

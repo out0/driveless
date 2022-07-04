@@ -84,11 +84,11 @@ int main(int argc, char **argv)
                                  "net/classes.txt",
                                  "net/colors.txt",
                                  "input.1",
-                                 "3545",
-                                 1000,
-                                 precisionType::TYPE_INT8,
+                                 "3545",                                
+                                 10,
+                                 precisionType::TYPE_FP16,
                                  deviceType::DEVICE_GPU,
-                                 true);
+                                 false);
 
     //segNet *net = nullptr;
     visionProc = new NeuralNetVision(camera, net, computeOG, procHandler, logger);

@@ -11,7 +11,8 @@ public:
     virtual void FrameSkipSegmentationOverlayError() = 0;
     virtual void FrameSkipSegmentationMaskError() = 0;
     virtual void FrameCaptured(SourceImageFormat *result_value, uint32_t width, uint32_t height) = 0;
-    virtual void FrameProcessResult(void *result_value) = 0;
+    virtual void FrameSegmentationSuccess(SourceImageFormat *result_value, uint32_t width, uint32_t height) = 0;
+    virtual void FrameProcessResult(char *result_value, uint32_t width, uint32_t height) = 0;
 };
 
 #endif

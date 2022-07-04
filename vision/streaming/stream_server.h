@@ -62,6 +62,7 @@ public:
     bool CheckOutputStreamExists(const char * clientIP,  int clientPort);
     void CreateOutputStream(const char * clientIP, int clientPort);
     void NewFrame(SourceImageFormat *frame, uint32_t width, uint32_t height);
+    void NewFrame(char *frame, uint32_t width, uint32_t height);
 };
 
 #endif

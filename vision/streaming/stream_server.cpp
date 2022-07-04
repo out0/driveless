@@ -1,5 +1,8 @@
 
 #include "stream_server.h"
+#include <jetson-utils/cudaMappedMemory.h>
+#include <opencv2/core/cuda/vec_traits.hpp>
+
 
 static void listener(StreamServer *streamServer);
 
@@ -165,6 +168,48 @@ void StreamServer::NewFrame(SourceImageFormat *frame, uint32_t width, uint32_t h
             this->clients->erase(itr);
             delete sc;
         }
+    }
+}
+void StreamServer::NewFrame(char *frame, uint32_t width, uint32_t height)
+{
+
+    if (!active || this->clients->size() == 0)
+        return;
+
+    for (std::vector<StreamClient *>::iterator itr = this->clients->begin(); itr != this->clients->end(); ++itr)
+    {
+        StreamClient *sc = *itr;
+        if (sc->stream == nullptr)
+        {
+            std::cout << "deleting streaming\n";
+            this->clients->erase(itr);
+            delete sc;
+            continue;
+        }
+
+        uint32_t n = width * height;
+        uchar3 * p = (uchar3 *)malloc(sizeof(uchar3)*n);
+        
+        for (uint32_t i = 0; i < n; i++) {
+            p[i].x = (uchar)frame[i];
+            p[i].y = 0;
+            p[i].z = 0;
+        }
+
+        sc->stream->Render(p, width, height);
+
+        char str[256];
+        sprintf(str, "Video Viewer (%ux%u) | %.1f FPS", width, height, sc->stream->GetFrameRate());
+        sc->stream->SetStatus(str);
+
+        if (!sc->stream->IsStreaming())
+        {
+            sc->stream->Close();
+            this->clients->erase(itr);
+            delete sc;
+        }
+
+        delete p;
     }
 }
 

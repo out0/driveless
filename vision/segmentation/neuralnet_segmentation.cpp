@@ -159,7 +159,7 @@ bool NeuralNetVision::processSegmentation(SourceImageFormat *frame)
     }
     logger->info("neuralnet: mask");
 
-    CUDA(cudaDeviceSynchronize());
+    CUDA(cudaDeviceSynchronize());    
     return true;
 }
 
@@ -172,15 +172,16 @@ void NeuralNetVision::loop()
     logger->info("frame captured");
     procHandler->FrameCaptured(frame, input->GetWidth(), input->GetHeight());
 
-    // if (!processSegmentation(frame))
-    //     return;
+    if (!processSegmentation(frame))
+         return;
 
     logger->info("frame processed");
+    procHandler->FrameSegmentationSuccess(imgOverlay, input->GetWidth(), input->GetHeight());
 
-    // char *occupancyGrid = ocgrid->ComputeOcuppancyGrid(imgMask, maskSize);
-    // logger->info("OG computed");
+    char *occupancyGrid = ocgrid->ComputeOcuppancyGrid(imgMask, maskSize);
+    logger->info("OG computed");
 
-    // procHandler->FrameProcessResult(occupancyGrid);
+    procHandler->FrameProcessResult(occupancyGrid, maskSize.x, maskSize.y);
 }
 
 void NeuralNetVision::LoopUntilSignaled()
