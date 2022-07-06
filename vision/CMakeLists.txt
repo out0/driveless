@@ -33,7 +33,7 @@ SET(TARGET_H
     occupancy_grid/occupancy_grid.h
     log/logger.h
     segmentation/neuralnet_segmentation.h
-    streaming/stream_server.h
+    communication/stream_server.h
 )
 
 cuda_add_executable(
@@ -43,7 +43,7 @@ cuda_add_executable(
     control/process_handler_impl.cpp 
     log/logger_debug_stdout.cpp 
     segmentation/neuralnet_segmentation.cpp
-    streaming/stream_server.cpp
+    communication/stream_server.cpp
 )
 
 # link my-recognition to jetson-inference library

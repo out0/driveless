@@ -4,7 +4,9 @@
 class OccupancyGrid
 {
 public:
-   virtual char *ComputeOcuppancyGrid(void *frame, int2 &maskSize) = 0;
+   virtual int GetWidth() = 0;
+   virtual int GetHeight() = 0;
+   virtual char *ComputeOcuppancyGrid(void *frame, int width, int height) = 0;
 };
 
 #endif

@@ -9,8 +9,7 @@
 #include <jetson-utils/cudaMappedMemory.h>
 
 #include "occupancy_grid.h"
-
-typedef uchar3 pixelType;
+#include "../model/vision_formats.h"
 
 class OccupancyGridImpl : public OccupancyGrid
 {
@@ -42,9 +41,7 @@ private:
         cv::Point3d p;
         p.x = zero_zero_grid_x + j * grid_side + grid_side / 2.0;
         p.z = zero_zero_grid_z + i * grid_side + grid_side / 2.0;
-        // p.y = 0;
-        p.y = -cam_height;
-        return p;
+        // p.y = 0;pixelType
     }
 
     cv::Point3d get_pos_grid_scale(int i, int j)
@@ -182,9 +179,18 @@ public:
         computeGridProjectedPoints();
     }
 
-    char *ComputeOcuppancyGrid(void *frame_input, int2 &maskSize) override
+    int GetWidth() override
     {
-        pixelType *frame = (pixelType *)frame_input;
+        return og_width;
+    }
+    int GetHeight() override
+    {
+        return og_depth;
+    }
+
+    char *ComputeOcuppancyGrid(void *frame_input, int width, int height) override
+    {
+        SourceImageFormat *frame = (SourceImageFormat *)frame_input;
 
         char *grid = (char *)malloc(sizeof(char) * og_depth * og_width);
         memset(grid, 0, og_width);
@@ -196,11 +202,11 @@ public:
                 long long int pixel_w = double2int((projectedPoints[i * grid_dims[1] + j].x) / 2.0);
                 long long int pixel_h = double2int((projectedPoints[i * grid_dims[1] + j].y) / 2.0);
 
-                if (pixel_w >= maskSize.x || pixel_w < 0 || pixel_h >= maskSize.y || pixel_h < 0)
+                if (pixel_w >= width || pixel_w < 0 || pixel_h >= height || pixel_h < 0)
                     continue;
                 else
                 {
-                    char *uc = reinterpret_cast<char *>(&frame[maskSize.x * pixel_h + pixel_w]);
+                    char *uc = reinterpret_cast<char *>(&frame[width * pixel_h + pixel_w]);
                     uint r, g, b;
                     r = *uc;
                     g = *(++uc);

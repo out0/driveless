@@ -19,19 +19,19 @@
 
 using namespace std;
 
-class StreamClient {
+class ClientConnection {
 public:    
     videoOutput * stream;
     const char *clientIP;
     int clientPort;
 
-    StreamClient(const char * clientIP, int clientPort, videoOutput * stream) {
+    ClientConnection(const char * clientIP, int clientPort, videoOutput * stream) {
         this->clientIP = clientIP;
         this->clientPort = clientPort;
         this->stream = stream;
     }
 
-    ~StreamClient() {
+    ~ClientConnection() {
         delete stream;
         delete clientIP;
     }
@@ -41,7 +41,7 @@ class StreamServer
 {
 private:
     int listenPort;
-    vector<StreamClient *> *clients;
+    vector<ClientConnection *> *clients;
     thread *main;
     Logger *logger;
     ProcHandler *procHandler;

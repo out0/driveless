@@ -34,6 +34,7 @@ private:
     SourceImageFormat *imgOverlay = NULL;   // input + alpha-blended mask
     SourceImageFormat *imgComposite = NULL; // overlay with mask next to it
     SourceImageFormat *imgOutput = NULL;    // reference to one of the above three
+    SourceImageFormat *imgOG = NULL; // overlay with mask next to it
     uint32_t visualizationFlags;
 
     int2 maskSize;

@@ -28,7 +28,7 @@ add_executable(
     stream_tst
     test_receive_streams.cpp
     ../../log/logger_debug_stdout.cpp
-    ../../streaming/stream_client.cpp
+    ../../communication/stream_client.cpp
 )
 
 # link my-recognition to jetson-inference library

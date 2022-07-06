@@ -18,7 +18,7 @@ StreamServer::StreamServer(std::string serviceName, int listenPort, Logger *logg
     }
     this->listenPort = listenPort;
 
-    this->clients = new vector<StreamClient *>();
+    this->clients = new vector<ClientConnection *>();
     this->main = nullptr;
     this->serviceName = serviceName;
     this->active = false;
@@ -109,7 +109,7 @@ static void listener(StreamServer *streamServer)
 
 bool StreamServer::CheckOutputStreamExists(const char *clientIP, int clientPort)
 {
-    for (StreamClient *sc : *this->clients)
+    for (ClientConnection *sc : *this->clients)
     {
         if (strcmp(sc->clientIP, clientIP) == 0 && sc->clientPort == clientPort)
         {
@@ -134,7 +134,7 @@ void StreamServer::CreateOutputStream(const char *clientIP, int clientPort)
     options.deviceType = videoOptions::DEVICE_FILE;
     options.ioType = videoOptions::OUTPUT;
     options.codec = videoOptions::CODEC_H264;
-    StreamClient *sc = new StreamClient(clientIP, clientPort, videoOutput::Create(uri, options));
+    ClientConnection *sc = new ClientConnection(clientIP, clientPort, videoOutput::Create(uri, options));
 
     this->clients->push_back(sc);
 }
@@ -145,9 +145,9 @@ void StreamServer::NewFrame(SourceImageFormat *frame, uint32_t width, uint32_t h
     if (!active || this->clients->size() == 0)
         return;
 
-    for (std::vector<StreamClient *>::iterator itr = this->clients->begin(); itr != this->clients->end(); ++itr)
+    for (std::vector<ClientConnection *>::iterator itr = this->clients->begin(); itr != this->clients->end(); ++itr)
     {
-        StreamClient *sc = *itr;
+        ClientConnection *sc = *itr;
         if (sc->stream == nullptr)
         {
             std::cout << "deleting streaming\n";
@@ -176,9 +176,9 @@ void StreamServer::NewFrame(char *frame, uint32_t width, uint32_t height)
     if (!active || this->clients->size() == 0)
         return;
 
-    for (std::vector<StreamClient *>::iterator itr = this->clients->begin(); itr != this->clients->end(); ++itr)
+    for (std::vector<ClientConnection *>::iterator itr = this->clients->begin(); itr != this->clients->end(); ++itr)
     {
-        StreamClient *sc = *itr;
+        ClientConnection *sc = *itr;
         if (sc->stream == nullptr)
         {
             std::cout << "deleting streaming\n";
@@ -221,7 +221,7 @@ void StreamServer::Stop()
     active = false;
     close(listenerFd);
 
-    for (StreamClient *sc : *this->clients)
+    for (ClientConnection *sc : *this->clients)
     {
         sc->stream->Close();
         delete sc;

@@ -56,6 +56,13 @@ bool NeuralNetVision::allocBuffers(int width, int height, uint32_t flags)
         outputSize = compositeSize;
     }
 
+    auto ogSize = make_int2(ocgrid->GetWidth(), ocgrid->GetHeight());
+    if (!cudaAllocMapped(&imgOG, ogSize))
+    {
+        LogError("segnet:  failed to allocate CUDA memory for OG output\n");
+        return false;
+    }
+
     return true;
 }
 
@@ -159,7 +166,7 @@ bool NeuralNetVision::processSegmentation(SourceImageFormat *frame)
     }
     logger->info("neuralnet: mask");
 
-    CUDA(cudaDeviceSynchronize());    
+    CUDA(cudaDeviceSynchronize());
     return true;
 }
 
@@ -173,15 +180,18 @@ void NeuralNetVision::loop()
     procHandler->FrameCaptured(frame, input->GetWidth(), input->GetHeight());
 
     if (!processSegmentation(frame))
-         return;
+        return;
 
     logger->info("frame processed");
     procHandler->FrameSegmentationSuccess(imgOverlay, input->GetWidth(), input->GetHeight());
 
-    char *occupancyGrid = ocgrid->ComputeOcuppancyGrid(imgMask, maskSize);
+    char *occupancyGrid = ocgrid->ComputeOcuppancyGrid(imgMask, ocgrid->GetWidth(), ocgrid->GetHeight());
+    for (int i = 0; i < ocgrid->GetWidth() * ocgrid->GetHeight(); i++) {
+        imgOG[i] = make_uchar3(occupancyGrid[i], 0, 0);
+    }
     logger->info("OG computed");
 
-    procHandler->FrameProcessResult(occupancyGrid, maskSize.x, maskSize.y);
+    procHandler->FrameProcessResult(imgOG, ocgrid->GetWidth(), ocgrid->GetHeight());
 }
 
 void NeuralNetVision::LoopUntilSignaled()
