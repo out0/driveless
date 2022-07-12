@@ -21,14 +21,14 @@ link_directories(/usr/lib/aarch64-linux-gnu/tegra)
 SET(TARGET_H
     ../../model/vision_formats.h
     ../../log/logger.h
-    ../../streaming/stream_client.h
+    ../../communication/stream_requester_client.h
 )
 
 add_executable(
     stream_tst
     test_receive_streams.cpp
     ../../log/logger_debug_stdout.cpp
-    ../../communication/stream_client.cpp
+    ../../communication/stream_requester_client.cpp
 )
 
 # link my-recognition to jetson-inference library

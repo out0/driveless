@@ -1,4 +1,4 @@
-#include "stream_client.h"
+#include "stream_requester_client.h"
 
 StreamClient::StreamClient(Logger *logger, std::string streamerIP, int streamerPort, int localPort)
 {

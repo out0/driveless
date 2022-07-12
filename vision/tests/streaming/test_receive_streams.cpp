@@ -1,5 +1,5 @@
 #include "../../log/logger.h"
-#include "../../communication/stream_client.h"
+#include "../../communication/stream_requester_client.h"
 #include <iostream>
 #include <string>
 
