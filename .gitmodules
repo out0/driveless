@@ -1,0 +1,6 @@
+[submodule "planner"]
+	path = planner
+	url = https://github.com/crawlerufsc/planner-module.git
+[submodule "vision"]
+	path = vision
+	url = https://github.com/crawlerufsc/vision-module.git
